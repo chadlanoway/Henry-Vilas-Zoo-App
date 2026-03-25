@@ -232,6 +232,11 @@ body {
     color: #153b7a;
 }
 
+.zoo-widget-btn.has-route {
+    background: #f4e27a;
+    color: #153b7a;
+}
+
 .zoo-route-tooltip {
     position: fixed;
     top: 18px;

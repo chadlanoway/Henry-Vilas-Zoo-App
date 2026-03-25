@@ -17,6 +17,11 @@ let routeRequestInFlight = false;
 let userLocationMarker = null;
 let destinationMarker = null;
 let tooltipEl = null;
+let routeActive = false;
+
+function hasActiveRoute() {
+    return routeActive;
+}
 
 function getOrCreateTooltip() {
     if (tooltipEl) return tooltipEl;
@@ -47,7 +52,7 @@ function hideTooltip() {
 function setRoutingButtonState() {
     const btn = document.getElementById('widget-route');
     if (!btn) return;
-
+    btn.classList.toggle('has-route', routeActive);
     btn.classList.toggle('active', routingArmed);
     btn.classList.toggle('loading', routeRequestInFlight);
     btn.setAttribute('aria-pressed', String(routingArmed));
@@ -122,6 +127,7 @@ function ensureRouteLayers() {
 }
 
 function clearRoute() {
+    routeActive = false;
     if (map.getSource(ROUTE_SOURCE_ID)) {
         map.getSource(ROUTE_SOURCE_ID).setData({
             type: 'FeatureCollection',
@@ -133,6 +139,15 @@ function clearRoute() {
         destinationMarker.remove();
         destinationMarker = null;
     }
+
+    if (userLocationMarker) {
+        userLocationMarker.remove();
+        userLocationMarker = null;
+    }
+
+    routingArmed = false;
+    routeRequestInFlight = false;
+    setRoutingButtonState();
 }
 
 function createUserLocationMarker() {
@@ -286,7 +301,7 @@ async function handleMapClick(event) {
 
         ensureRouteLayers();
         map.getSource(ROUTE_SOURCE_ID).setData(payload.route);
-
+        routeActive = true;
         fitRoute(payload.route);
 
         const distanceMeters = payload.summary?.distance_meters;
@@ -300,7 +315,10 @@ async function handleMapClick(event) {
             parts.push(`${Math.round(durationSeconds / 60)} min`);
         }
 
-        showTooltip(parts.length ? `Route ready: ${parts.join(' • ')}` : 'Route ready.');
+        showTooltip(parts.length
+            ? `Route ready: ${parts.join(' • ')}. Tap route again to clear.`
+            : 'Route ready. Tap route again to clear.'
+        );
 
         routingArmed = false;
         setRoutingButtonState();
@@ -348,6 +366,16 @@ function initRoutingWidget() {
     if (!btn) return;
 
     btn.addEventListener('click', () => {
+        if (hasActiveRoute()) {
+            clearRoute();
+            routingArmed = false;
+            hideTooltip();
+            setRoutingButtonState();
+            showTooltip('Route cleared.');
+            window.setTimeout(hideTooltip, 1800);
+            return;
+        }
+
         armRouting();
     });
 
