@@ -132,6 +132,11 @@
             const isCollapsed = panelWrap.classList.toggle('collapsed');
             panelTab.setAttribute('aria-expanded', String(!isCollapsed));
         });
+
+        const isSmallScreen = window.innerWidth < 480;
+
+        const startingZoom = isSmallScreen ? 14.25 : 15.75;
+
         const map = new maplibregl.Map({
             container: 'map',
             style: {
@@ -578,7 +583,7 @@
                 ]
             },
             center: [-89.41296024079732, 43.059350084177574],
-            zoom: 15.75,
+            zoom: startingZoom,
             pitch: 35
         });
         window.zooMap = map;
