@@ -647,8 +647,8 @@ body {
 
 @media (max-width: 700px) {
     :root {
-        --widget-size: 30px;
-        --logo-size: 86px;
+        --widget-size: 32px;
+        --logo-size: 96px;
     }
 
     .zoo-widgets {
