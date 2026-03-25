@@ -88,7 +88,7 @@ function loadAmenityIcons(map) {
             }
         };
 
-        img.src = `./icons/${name}.svg`;
+        img.src = `./img/icons/${name}.svg`;
     });
 }
 
