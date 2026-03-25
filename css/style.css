@@ -644,3 +644,136 @@ body {
     line-height: 1.45;
     color: rgba(255, 255, 255, 0.92);
 }
+
+@media (max-width: 700px) {
+    :root {
+        --widget-size: 38px;
+        --logo-size: 96px;
+    }
+
+    .zoo-widgets {
+        top: 12px;
+        right: 12px;
+        padding: 5px;
+        border-width: 3px;
+        gap: 5px;
+    }
+
+    .zoo-widget-btn {
+        border-width: 2px;
+    }
+
+    .zoo-widget-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .zoo-logo-wrap {
+        top: 12px;
+        left: 12px;
+        border-width: 3px;
+    }
+
+    .zoo-route-tooltip {
+        top: 12px;
+        right: 64px;
+        max-width: 220px;
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .zoo-panel-wrap {
+        width: 100vw;
+        height: 40vh;
+        min-height: 300px;
+        clip-path: none;
+        border-top-right-radius: 18px;
+    }
+
+    .zoo-panel {
+        top: 0;
+        left: 0;
+        right: 0;
+        clip-path: none;
+        border-top-right-radius: 16px;
+    }
+
+    .zoo-panel-tab {
+        left: 12px;
+        height: 50px;
+        min-width: 132px;
+        padding: 0 18px;
+        font-size: 15px;
+        line-height: 50px;
+    }
+
+    .zoo-panel-wrap.collapsed {
+        transform: translateY(calc(100% - 50px));
+    }
+
+    .zoo-panel-content {
+        left: 16px;
+        right: 16px;
+        top: 62px;
+        bottom: 12px;
+    }
+
+    .zoo-panel-content h2 {
+        font-size: 22px;
+        margin-bottom: 10px;
+    }
+
+    .zoo-panel-content p,
+    .zoo-panel-placeholder p,
+    .zoo-icon-legend-item,
+    .zoo-photo-status {
+        font-size: 14px;
+        line-height: 1.35;
+    }
+
+    .zoo-animal-label,
+    .zoo-icon-legend-title {
+        font-size: 13px;
+    }
+
+    .zoo-animal-select,
+    .zoo-upload-btn,
+    .zoo-basemap-option {
+        font-size: 14px;
+    }
+
+    .zoo-animal-picker,
+    .zoo-icon-legend,
+    .zoo-panel-placeholder {
+        padding: 14px 16px;
+        border-radius: 14px;
+    }
+
+    .zoo-icon-legend {
+        margin-top: 12px;
+    }
+
+    .zoo-icon-legend-img {
+        width: 20px;
+        height: 20px;
+        flex: 0 0 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .zoo-panel-wrap {
+        height: 42vh;
+        min-height: 290px;
+    }
+
+    .zoo-panel-grid,
+    .zoo-panel-layout {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .zoo-icon-legend-list {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+}
