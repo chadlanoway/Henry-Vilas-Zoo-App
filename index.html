@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Zoo Map</title>
+    <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.20.2/dist/maplibre-gl.css' />
+    <script src='https://unpkg.com/maplibre-gl@5.20.2/dist/maplibre-gl.js'></script>
+    <link rel='stylesheet' href='./css/style.css?v=10' />
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div class="zoo-logo-wrap">
+        <a href="https://www.henryvilaszoo.gov/" target="_blank" rel="noopener noreferrer" class="zoo-logo-link">
+            <img src="./img/henry-vilas-zoo-logo.png" class="zoo-logo">
+        </a>
+    </div>
+    <div id="zoo-panel-wrap" class="zoo-panel-wrap collapsed">
+        <div class="zoo-panel">
+            <button id="zoo-panel-tab" class="zoo-panel-tab" type="button" aria-expanded="false">
+                Map Info
+            </button>
+
+            <div class="zoo-panel-content">
+                <h2>Zoo Exhibits & Attractions</h2>
+
+                <div class="zoo-panel-grid">
+                    <div class="zoo-panel-cell zoo-panel-cell-left">
+                        <div class="zoo-animal-picker">
+                            <label for="animalSelect" class="zoo-animal-label">Find an Animal</label>
+                            <select id="animalSelect" class="zoo-animal-select">
+                                <option value="">Select an animal...</option>
+                            </select>
+                        </div>
+
+                        <div class="zoo-panel-placeholder">
+                            <div class="zoo-photo-upload">
+                                <button id="uploadPhotoBtn" class="zoo-upload-btn" type="button">
+                                    Upload Photo
+                                </button>
+
+                                <input id="zooPhotoInput" class="zoo-photo-input" type="file" accept="image/*" />
+
+                                <p id="zooPhotoStatus" class="zoo-photo-status">
+                                    Upload a zoo photo. EXIF GPS will be used if present; otherwise device location will
+                                    be used.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="zoo-panel-cell zoo-panel-cell-right">
+                        <div class="zoo-icon-legend">
+                            <div class="zoo-icon-legend-title">Amenity Icons</div>
+
+                            <div class="zoo-icon-legend-list">
+                                <div class="zoo-icon-legend-item">
+                                    <img src="./img/icons/picnic.svg" alt="Picnic icon" class="zoo-icon-legend-img">
+                                    <span>Picnic</span>
+                                </div>
+
+                                <div class="zoo-icon-legend-item">
+                                    <img src="./img/icons/playground.svg" alt="Playground icon"
+                                        class="zoo-icon-legend-img">
+                                    <span>Playground</span>
+                                </div>
+
+                                <div class="zoo-icon-legend-item">
+                                    <img src="./img/icons/parking.svg" alt="Parking icon" class="zoo-icon-legend-img">
+                                    <span>Parking</span>
+                                </div>
+
+                                <div class="zoo-icon-legend-item">
+                                    <img src="./img/icons/restroom.svg" alt="Restroom icon" class="zoo-icon-legend-img">
+                                    <span>Restroom</span>
+                                </div>
+
+                                <div class="zoo-icon-legend-item">
+                                    <img src="./img/icons/information.svg" alt="Information icon"
+                                        class="zoo-icon-legend-img">
+                                    <span>Information</span>
+                                </div>
+
+                                <div class="zoo-icon-legend-item">
+                                    <img src="./img/icons/gifts.svg" alt="Gift shop icon" class="zoo-icon-legend-img">
+                                    <span>Gift Shop</span>
+                                </div>
+
+                                <div class="zoo-icon-legend-item">
+                                    <img src="./img/icons/food.svg" alt="Food icon" class="zoo-icon-legend-img">
+                                    <span>Food</span>
+                                </div>
+
+                                <div class="zoo-icon-legend-item">
+                                    <img src="./img/icons/beach.svg" alt="Beach icon" class="zoo-icon-legend-img">
+                                    <span>Beach</span>
+                                </div>
+
+                                <div class="zoo-icon-legend-item">
+                                    <img src="./img/icons/basketball.svg" alt="Basketball icon"
+                                        class="zoo-icon-legend-img">
+                                    <span>Basketball</span>
+                                </div>
+
+                                <div class="zoo-icon-legend-item">
+                                    <img src="./img/icons/soccer.svg" alt="Soccer icon" class="zoo-icon-legend-img">
+                                    <span>Soccer</span>
+                                </div>
+
+                                <div class="zoo-icon-legend-item">
+                                    <img src="./img/icons/tennis.svg" alt="Tennis icon" class="zoo-icon-legend-img">
+                                    <span>Tennis</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <script>
+        const panelWrap = document.getElementById('zoo-panel-wrap');
+        const panelTab = document.getElementById('zoo-panel-tab');
+
+        panelWrap.classList.add('collapsed');
+
+        panelTab.addEventListener('click', () => {
+            const isCollapsed = panelWrap.classList.toggle('collapsed');
+            panelTab.setAttribute('aria-expanded', String(!isCollapsed));
+        });
+        const map = new maplibregl.Map({
+            container: 'map',
+            style: {
+                version: 8,
+                sources: {
+                    osm: {
+                        type: 'raster',
+                        tiles: [
+                            'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+                            'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+                            'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+                            'https://d.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+                        ],
+                        tileSize: 256,
+                        attribution: '&copy; OpenStreetMap contributors'
+                    },
+
+                    osmLight: {
+                        type: 'raster',
+                        tiles: [
+                            'https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                            'https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                            'https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                            'https://d.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
+                        ],
+                        tileSize: 256,
+                        attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+                    },
+
+                    osmLightNoLabels: {
+                        type: 'raster',
+                        tiles: [
+                            'https://a.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
+                            'https://b.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
+                            'https://c.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
+                            'https://d.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png'
+                        ],
+                        tileSize: 256,
+                        attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+                    },
+
+                    osmTopo: {
+                        type: 'raster',
+                        tiles: [
+                            'https://a.tile.opentopomap.org/{z}/{x}/{y}.png',
+                            'https://b.tile.opentopomap.org/{z}/{x}/{y}.png',
+                            'https://c.tile.opentopomap.org/{z}/{x}/{y}.png'
+                        ],
+                        tileSize: 256,
+                        attribution: '&copy; OpenStreetMap contributors, SRTM &copy; OpenTopoMap'
+                    },
+
+                    zoo: {
+                        type: 'vector',
+                        url: 'https://rgmvqeupim.us-east-1.awsapprunner.com/data/zoo.json'
+                    }
+                },
+                layers: [
+                    {
+                        id: 'osm-base',
+                        type: 'raster',
+                        source: 'osm',
+                        layout: {
+                            visibility: 'visible'
+                        },
+                        paint: {
+                            'raster-opacity': 0.65
+                        }
+                    },
+                    {
+                        id: 'osm-light',
+                        type: 'raster',
+                        source: 'osmLight',
+                        layout: {
+                            visibility: 'none'
+                        },
+                        paint: {
+                            'raster-opacity': 0.65
+                        }
+                    },
+                    {
+                        id: 'osm-light-nolabels',
+                        type: 'raster',
+                        source: 'osmLightNoLabels',
+                        layout: {
+                            visibility: 'none'
+                        },
+                        paint: {
+                            'raster-opacity': 0.65
+                        }
+                    },
+                    {
+                        id: 'osm-topo',
+                        type: 'raster',
+                        source: 'osmTopo',
+                        layout: {
+                            visibility: 'none'
+                        },
+                        paint: {
+                            'raster-opacity': 0.65
+                        }
+                    },
+
+                    {
+                        id: 'zoo_boundary',
+                        type: 'fill',
+                        source: 'zoo',
+                        'source-layer': 'zoo_boundary',
+                        minzoom: 14,
+                        paint: {
+                            'fill-color': '#D3FFBE',
+                            'fill-opacity': 0.85
+                        }
+                    },
+
+                    {
+                        id: 'zoo_interior_boundary',
+                        type: 'fill',
+                        source: 'zoo',
+                        'source-layer': 'zoo_interior_boundary',
+                        minzoom: 14,
+                        paint: {
+                            'fill-color': '#cfeecf',
+                            'fill-opacity': 0.85
+                        }
+                    },
+
+                    {
+                        id: 'enclosures',
+                        type: 'fill',
+                        source: 'zoo',
+                        'source-layer': 'enclosures',
+                        minzoom: 14,
+                        paint: {
+                            'fill-color': '#FFEABE', //#b7ddb0
+                            'fill-opacity': 0.45,
+                            'fill-outline-color': '#5a7d54'
+                        }
+                    },
+
+                    {
+                        id: 'enclosures-outline',
+                        type: 'line',
+                        source: 'zoo',
+                        'source-layer': 'enclosures',
+                        minzoom: 14,
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': '#E8D8B0',
+                            'line-width': 2,
+                            'line-opacity': 1
+                        }
+                    },
+
+                    {
+                        id: 'water',
+                        type: 'fill',
+                        source: 'zoo',
+                        'source-layer': 'water',
+                        minzoom: 14,
+                        paint: {
+                            'fill-color': '#7fc8e8',
+                            'fill-opacity': 0.8
+                        }
+                    },
+
+                    {
+                        id: 'water_outline',
+                        type: 'line',
+                        source: 'zoo',
+                        'source-layer': 'water',
+                        minzoom: 14,
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': '#000000',
+                            'line-width': 2,
+                            'line-opacity': 0.15
+                        }
+                    },
+
+                    {
+                        id: 'zoo_interior_boundary_outline',
+                        type: 'line',
+                        source: 'zoo',
+                        'source-layer': 'zoo_interior_boundary',
+                        minzoom: 14,
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': '#000000',
+                            'line-width': 2,
+                            'line-opacity': 0.10
+                        }
+                    },
+
+                    {
+                        id: 'greenspace-base',
+                        type: 'fill',
+                        source: 'zoo',
+                        'source-layer': 'greenspace',
+                        minzoom: 14,
+                        paint: {
+                            'fill-color': '#a9d18e',
+                            'fill-opacity': 0.9
+                        }
+                    },
+
+                    {
+                        id: 'greenspace-outline',
+                        type: 'line',
+                        source: 'zoo',
+                        'source-layer': 'greenspace',
+                        minzoom: 14,
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': '#5f7f4f',
+                            'line-width': 1.5,
+                            'line-opacity': 0.9
+                        }
+                    },
+
+                    {
+                        id: 'parks_parking',
+                        type: 'fill',
+                        source: 'zoo',
+                        'source-layer': 'parks_parking',
+                        minzoom: 14,
+                        paint: {
+                            'fill-color': [
+                                'match',
+                                ['get', 'type'],
+                                'recreation', '#BFE3B4',
+                                'playground', '#F4D35E',
+                                'parking', '#E1E1E1',
+                                'beach', '#F3E3B0',
+                                '#E1E1E1'
+                            ],
+                            'fill-opacity': 0.75
+                        }
+                    },
+                    {
+                        id: 'parks_parking-borders',
+                        type: 'line',
+                        source: 'zoo',
+                        'source-layer': 'parks_parking',
+                        minzoom: 14,
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': [
+                                'match',
+                                ['get', 'type'],
+                                'recreation', '#7FA36F',
+                                'playground', '#C49A1D',
+                                'parking', '#8A8A8A',
+                                'beach', '#CDBB7C',
+                                '#8A8A8A'
+                            ],
+                            'line-width': 1.5,
+                            'line-opacity': 0.9
+                        }
+                    },
+
+                    {
+                        id: 'paths-foot',
+                        type: 'line',
+                        source: 'zoo',
+                        'source-layer': 'paths',
+                        minzoom: 14,
+                        filter: ['==', ['get', 'type'], 'foot'],
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': '#d99c9c',
+                            'line-width': 2,
+                            'line-dasharray': [1, 2],
+                            'line-opacity': 1
+                        }
+                    },
+
+                    {
+                        id: 'paths-bike',
+                        type: 'line',
+                        source: 'zoo',
+                        'source-layer': 'paths',
+                        minzoom: 14,
+                        filter: ['==', ['get', 'type'], 'bike'],
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': '#4955bf',
+                            'line-width': 2,
+                            'line-dasharray': [1, 2],
+                            'line-opacity': 1
+                        }
+                    },
+
+                    {
+                        id: 'paths-paved-outline',
+                        type: 'line',
+                        source: 'zoo',
+                        'source-layer': 'paths',
+                        minzoom: 15.5,
+                        filter: ['==', ['get', 'type'], 'paved'],
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': '#000000',
+                            'line-width': 9,
+                            'line-opacity': 0.75
+                        }
+                    },
+
+                    {
+                        id: 'paths-paved',
+                        type: 'line',
+                        source: 'zoo',
+                        'source-layer': 'paths',
+                        minzoom: 15.5,
+                        filter: ['==', ['get', 'type'], 'paved'],
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': '#d6d6d6',
+                            'line-width': 8,
+                            'line-opacity': 1
+                        }
+                    },
+
+                    {
+                        id: 'paths-bridge',
+                        type: 'line',
+                        source: 'zoo',
+                        'source-layer': 'paths',
+                        minzoom: 14,
+                        filter: ['==', ['get', 'type'], 'bridge'],
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': '#7a5a3a',
+                            'line-width': 3,
+                            'line-opacity': 0.85
+                        }
+                    },
+
+                    {
+                        id: 'paths-zoo-train',
+                        type: 'line',
+                        source: 'zoo',
+                        'source-layer': 'paths',
+                        minzoom: 14,
+                        filter: ['==', ['get', 'type'], 'zoo train'],
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': '#555555',
+                            'line-width': 2,
+                            'line-dasharray': [4, 2],
+                            'line-opacity': 0.85
+
+                        }
+                    },
+
+                    {
+                        id: 'zoo_boundary_outline',
+                        type: 'line',
+                        source: 'zoo',
+                        'source-layer': 'zoo_boundary',
+                        minzoom: 14,
+                        paint: {
+                            'line-color': '#2f4f2f',
+                            'line-width': 5,
+                            'line-dasharray': [2, 2],
+                            'line-opacity': 0.85
+                        },
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        }
+                    },
+                    {
+                        id: 'buildings-shadow',
+                        type: 'fill',
+                        source: 'zoo',
+                        'source-layer': 'buildings',
+                        minzoom: 17,
+                        paint: {
+                            'fill-color': '#000000',
+                            'fill-opacity': 0.18,
+                            'fill-translate': [5, 5],
+                            'fill-translate-anchor': 'viewport'
+                        }
+                    },
+                    {
+                        id: 'buildings',
+                        type: 'fill-extrusion',
+                        source: 'zoo',
+                        'source-layer': 'buildings',
+                        minzoom: 14,
+                        paint: {
+                            'fill-extrusion-color': [
+                                'interpolate',
+                                ['linear'],
+                                ['%', ['id'], 3],
+                                0, '#A88C6B',
+                                1, '#9c7f60',
+                                2, '#b59a7c'
+                            ],
+                            'fill-extrusion-height': [
+                                '+',
+                                5,
+                                ['*', 3, ['%', ['id'], 2]]
+                            ],
+                            'fill-extrusion-base': 0,
+                            'fill-extrusion-opacity': 0.95,
+                            'fill-extrusion-vertical-gradient': true
+                        }
+                    }
+                ]
+            },
+            center: [-89.41296024079732, 43.059350084177574],
+            zoom: 15.75,
+            pitch: 35
+        });
+        window.zooMap = map;
+        map.on('style.load', () => {
+            map.setProjection({
+                type: 'globe',
+            });
+
+        });
+        map.on('load', () => {
+            map.setLight({
+                anchor: 'viewport',
+                color: '#ffffff',
+                intensity: 0.4
+            });
+
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                map.addImage('tree-pattern', img);
+                console.log('image loaded:', map.hasImage('tree-pattern'));
+                map.addLayer({
+                    id: 'greenspace-pattern',
+                    type: 'fill',
+                    source: 'zoo',
+                    'source-layer': 'greenspace',
+                    minzoom: 14,
+                    paint: { 'fill-pattern': 'tree-pattern' }
+                }, 'parks_parking');
+            };
+            img.onerror = (e) => console.error('failed', e);
+            img.src = './img/greenspace.png';
+        });
+    </script>
+    <script src="https://unpkg.com/exifr/dist/lite.umd.js"></script>
+    <script type="module" src="./js/widgets.js?1"></script>
+    <script type="module" src="./js/clickHandlers.js?1"></script>
+    <script type="module" src="./js/labels.js?1"></script>
+    <script type="module" src="./js/animals.js?1"></script>
+    <script type="module" src="./js/photos.js?1"></script>
+    <script type="module" src="./js/routing.js?1"></script>
+
+
+</body>
+
+</html>
