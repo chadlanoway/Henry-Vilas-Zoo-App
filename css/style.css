@@ -361,7 +361,6 @@ body {
     --logo-size: 120px;
 }
 
-/* wrapper = the circle */
 .zoo-logo-wrap {
     position: fixed;
     top: 18px;
@@ -375,14 +374,11 @@ body {
     justify-content: center;
 
     background: rgba(255, 255, 255, 0.65);
-    /* semi transparent white */
     border: 4px solid #f4e27a;
-    /* same yellow */
     border-radius: 50%;
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
 }
 
-/* image inside the circle */
 .zoo-logo {
     width: 80%;
     height: auto;
@@ -481,7 +477,6 @@ body {
     }
 }
 
-/* WebKit browsers (Chrome, Edge, Safari) */
 .zoo-panel-content::-webkit-scrollbar {
     width: 10px;
 }
@@ -493,10 +488,8 @@ body {
 
 .zoo-panel-content::-webkit-scrollbar-thumb {
     background: #f4e27a;
-    /* your yellow */
     border-radius: 999px;
     border: 2px solid #153b7a;
-    /* matches panel blue */
 }
 
 .zoo-panel-content::-webkit-scrollbar-thumb:hover {
@@ -585,25 +578,20 @@ body {
         0 0 16px rgba(244, 226, 122, 0.55);
 }
 
-/* Target the dropdown itself */
 #animalSelect {
     max-height: 200px;
-    /* ensures scroll appears */
     overflow-y: auto;
 }
 
-/* Scrollbar track */
 #animalSelect::-webkit-scrollbar {
     width: 10px;
 }
 
-/* Scrollbar background */
 #animalSelect::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.08);
     border-radius: 8px;
 }
 
-/* Scrollbar thumb */
 #animalSelect::-webkit-scrollbar-thumb {
     background: #f4e27a;
     border-radius: 8px;
@@ -611,7 +599,6 @@ body {
     background-clip: content-box;
 }
 
-/* Hover effect */
 #animalSelect::-webkit-scrollbar-thumb:hover {
     background: #ffe96a;
 }
@@ -656,156 +643,4 @@ body {
     font-size: 13px;
     line-height: 1.45;
     color: rgba(255, 255, 255, 0.92);
-}
-
-@media (max-width: 700px) {
-    :root {
-        --widget-size: 58px;
-        --logo-size: 148px;
-    }
-
-    .zoo-logo-wrap {
-        top: 14px;
-        left: 14px;
-        border-width: 5px;
-    }
-
-    .zoo-widgets {
-        top: 14px;
-        right: 14px;
-        padding: 10px;
-        border-width: 5px;
-        gap: 8px;
-    }
-
-    .zoo-widget-btn {
-        border-width: 3px;
-    }
-
-    .zoo-widget-icon {
-        width: 26px;
-        height: 26px;
-    }
-
-    .zoo-route-tooltip {
-        top: 14px;
-        right: 92px;
-        max-width: min(56vw, 260px);
-        padding: 12px 16px;
-        font-size: 15px;
-        line-height: 1.4;
-    }
-
-    .zoo-panel-wrap {
-        width: 100vw;
-        height: 54vh;
-        min-height: 420px;
-        clip-path: none;
-        border-top-right-radius: 24px;
-    }
-
-    .zoo-panel {
-        top: 0;
-        left: 0;
-        right: 0;
-        clip-path: none;
-        border-top-right-radius: 22px;
-    }
-
-    .zoo-panel-tab {
-        left: 14px;
-        height: 62px;
-        min-width: 165px;
-        padding: 0 22px;
-        font-size: 18px;
-        line-height: 62px;
-    }
-
-    .zoo-panel-wrap.collapsed {
-        transform: translateY(calc(100% - 62px));
-    }
-
-    .zoo-panel-content {
-        left: 18px;
-        right: 18px;
-        top: 78px;
-        bottom: 16px;
-    }
-
-    .zoo-panel-content h2 {
-        font-size: 32px;
-        margin-bottom: 14px;
-    }
-
-    .zoo-panel-content p,
-    .zoo-panel-placeholder p,
-    .zoo-photo-status,
-    .zoo-icon-legend-item,
-    .zoo-basemap-option,
-    .zoo-animal-select,
-    .zoo-upload-btn {
-        font-size: 17px;
-        line-height: 1.45;
-    }
-
-    .zoo-animal-label,
-    .zoo-icon-legend-title {
-        font-size: 16px;
-    }
-
-    .zoo-animal-picker,
-    .zoo-icon-legend,
-    .zoo-panel-placeholder {
-        padding: 18px;
-        border-radius: 20px;
-    }
-
-    .zoo-upload-btn {
-        padding: 14px 20px;
-    }
-
-    .zoo-animal-select {
-        min-height: 52px;
-        padding: 14px 46px 14px 18px;
-    }
-
-    .zoo-icon-legend-img {
-        width: 28px;
-        height: 28px;
-        flex-basis: 28px;
-    }
-}
-
-@media (max-width: 480px) {
-    :root {
-        --widget-size: 62px;
-        --logo-size: 158px;
-    }
-
-    .zoo-route-tooltip {
-        left: 14px;
-        right: 14px;
-        top: 96px;
-        max-width: none;
-    }
-
-    .zoo-panel-wrap {
-        height: 58vh;
-        min-height: 440px;
-    }
-
-    .zoo-panel-layout,
-    .zoo-panel-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-
-    .zoo-icon-legend {
-        margin-top: 0;
-    }
-
-    .zoo-icon-legend-list {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
 }
