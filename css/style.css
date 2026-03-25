@@ -408,7 +408,7 @@ body {
 .zoo-panel-placeholder {
     min-height: 150px;
     padding: 18px 20px;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0);
     border: 0px solid rgba(244, 226, 122, 0.35);
     border-radius: 18px;
 }
@@ -421,6 +421,7 @@ body {
 }
 
 .zoo-icon-legend {
+    margin-top: 30px;
     padding: 18px 20px;
     background: rgba(255, 255, 255, 0.08);
     border: 2px solid rgba(244, 226, 122, 0.35);
