@@ -7,7 +7,7 @@
     <title>Zoo Map</title>
     <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.20.2/dist/maplibre-gl.css' />
     <script src='https://unpkg.com/maplibre-gl@5.20.2/dist/maplibre-gl.js'></script>
-    <link rel='stylesheet' href='./css/style.css?v=13' />
+    <link rel='stylesheet' href='style.css?v=12' />
     <style>
 
     </style>
@@ -27,15 +27,40 @@
             </button>
 
             <div class="zoo-panel-content">
-                <div class="zoo-panel-grid">
-                    <div class="zoo-panel-cell zoo-panel-cell-left">
+
+                <div class="zoo-panel-tabs" role="tablist" aria-label="Zoo panel sections">
+                    <button class="zoo-panel-tab-link active" type="button" data-panel-tab="animals" role="tab"
+                        aria-selected="true">
+                        Find Animals
+                    </button>
+
+                    <button class="zoo-panel-tab-link" type="button" data-panel-tab="photos" role="tab"
+                        aria-selected="false">
+                        Add Photo
+                    </button>
+
+                    <button class="zoo-panel-tab-link" type="button" data-panel-tab="amenities" role="tab"
+                        aria-selected="false">
+                        Amenities
+                    </button>
+
+                    <button class="zoo-panel-tab-link" type="button" data-panel-tab="legend" role="tab"
+                        aria-selected="false">
+                        Legend
+                    </button>
+                </div>
+
+                <div class="zoo-panel-views">
+                    <section class="zoo-panel-view active" data-panel-view="animals" role="tabpanel">
                         <div class="zoo-animal-picker">
-                            <label for="animalSelect" class="zoo-animal-label">Find an Animal</label>
+
                             <select id="animalSelect" class="zoo-animal-select">
                                 <option value="">Select an animal...</option>
                             </select>
                         </div>
+                    </section>
 
+                    <section class="zoo-panel-view" data-panel-view="photos" role="tabpanel" hidden>
                         <div class="zoo-panel-placeholder">
                             <div class="zoo-photo-upload">
                                 <button id="uploadPhotoBtn" class="zoo-upload-btn" type="button">
@@ -50,9 +75,28 @@
                                 </p>
                             </div>
                         </div>
-                    </div>
+                    </section>
 
-                    <div class="zoo-panel-cell zoo-panel-cell-right">
+                    <section class="zoo-panel-view" data-panel-view="amenities" role="tabpanel" hidden>
+                        <div class="zoo-animal-picker">
+                            <select id="amenitySelect" class="zoo-animal-select">
+                                <option value="">Select an amenity...</option>
+                                <option value="restroom">Restroom</option>
+                                <option value="information">Information</option>
+                                <option value="gifts">Gift Shop</option>
+                                <option value="food">Food</option>
+                                <option value="parking">Parking</option>
+                                <option value="picnic">Picnic</option>
+                                <option value="playground">Playground</option>
+                                <option value="beach">Beach</option>
+                                <option value="basketball">Basketball</option>
+                                <option value="soccer">Soccer</option>
+                                <option value="tennis">Tennis</option>
+                            </select>
+                        </div>
+                    </section>
+
+                    <section class="zoo-panel-view" data-panel-view="legend" role="tabpanel" hidden>
                         <div class="zoo-icon-legend">
 
 
@@ -116,7 +160,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </section>
                 </div>
             </div>
         </div>
@@ -133,6 +177,30 @@
             panelTab.setAttribute('aria-expanded', String(!isCollapsed));
         });
 
+        const panelTabLinks = Array.from(document.querySelectorAll('.zoo-panel-tab-link'));
+        const panelViews = Array.from(document.querySelectorAll('.zoo-panel-view'));
+
+        function activatePanelView(viewName) {
+            panelTabLinks.forEach((btn) => {
+                const isActive = btn.dataset.panelTab === viewName;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-selected', String(isActive));
+            });
+
+            panelViews.forEach((view) => {
+                const isActive = view.dataset.panelView === viewName;
+                view.classList.toggle('active', isActive);
+                view.hidden = !isActive;
+            });
+        }
+
+        panelTabLinks.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                activatePanelView(btn.dataset.panelTab);
+            });
+        });
+
+        activatePanelView('animals');
         const isSmallScreen = window.innerWidth < 480;
 
         const startingZoom = isSmallScreen ? 14.25 : 15.75;
@@ -580,6 +648,7 @@
                             'fill-extrusion-vertical-gradient': true
                         }
                     }
+                    /* labels intentionally omitted for now */
                 ]
             },
             center: [-89.41296024079732, 43.059350084177574],
@@ -589,7 +658,7 @@
         window.zooMap = map;
         map.on('style.load', () => {
             map.setProjection({
-                type: 'globe',
+                type: 'globe', // Set projection to globe
             });
 
         });
@@ -624,8 +693,8 @@
     <script type="module" src="./js/labels.js?1"></script>
     <script type="module" src="./js/animals.js?1"></script>
     <script type="module" src="./js/photos.js?1"></script>
-    <script type="module" src="./js/routing.js?1"></script>
-
+    <script type="module" src="./js/routing.js?2"></script>
+    <script src="./js/amenities.js?v=2"></script>
 
 </body>
 

@@ -83,7 +83,7 @@ function ensureRouteLayers() {
             paint: {
                 'line-color': '#f4e27a',
                 'line-width': 10,
-                'line-opacity': 0.35,
+                'line-opacity': 0.55,
                 'line-blur': 1.2
             }
         });
@@ -102,7 +102,7 @@ function ensureRouteLayers() {
             paint: {
                 'line-color': '#21468e',
                 'line-width': 6,
-                'line-opacity': 0.95
+                'line-opacity': 0.75
             }
         });
     }
@@ -266,20 +266,15 @@ function fitRoute(geojson) {
     });
 }
 
-async function handleMapClick(event) {
-    if (!routingArmed || routeRequestInFlight) return;
-
-    const endLngLat = {
-        lng: event.lngLat.lng,
-        lat: event.lngLat.lat
-    };
+async function buildRouteTo(endLngLat, startLngLatOverride = null) {
+    if (routeRequestInFlight) return;
 
     routeRequestInFlight = true;
     setRoutingButtonState();
-    showTooltip('Getting route...');
+    showTooltip('Getting route.');
 
     try {
-        const startLngLat = await getDeviceLocation();
+        const startLngLat = startLngLatOverride || await getDeviceLocation();
 
         if (!userLocationMarker) {
             userLocationMarker = createUserLocationMarker();
@@ -315,17 +310,15 @@ async function handleMapClick(event) {
             parts.push(`${Math.round(durationSeconds / 60)} min`);
         }
 
-        showTooltip(parts.length
-            ? `Route ready: ${parts.join(' • ')}. Tap route again to clear.`
-            : 'Route ready. Tap route again to clear.'
+        showTooltip(
+            parts.length
+                ? `Route ready: ${parts.join(' • ')}. Tap route again to clear.`
+                : 'Route ready. Tap route again to clear.'
         );
 
         routingArmed = false;
         setRoutingButtonState();
-
-        window.setTimeout(() => {
-            hideTooltip();
-        }, 2600);
+        window.setTimeout(hideTooltip, 2600);
     } catch (error) {
         console.error('Routing error:', error);
         showTooltip(error.message || 'Unable to build route.', true);
@@ -333,6 +326,15 @@ async function handleMapClick(event) {
         routeRequestInFlight = false;
         setRoutingButtonState();
     }
+}
+
+async function handleMapClick(event) {
+    if (!routingArmed || routeRequestInFlight) return;
+
+    await buildRouteTo({
+        lng: event.lngLat.lng,
+        lat: event.lngLat.lat
+    });
 }
 
 function armRouting() {
@@ -386,6 +388,7 @@ function initRoutingWidget() {
 }
 
 window.zooClearRoute = clearRoute;
+window.zooBuildRouteTo = buildRouteTo;
 
 if (map.loaded()) {
     initRoutingWidget();
