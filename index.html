@@ -4,10 +4,10 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zoo Map</title>
+    <title>Vilas Zoo Map</title>
     <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.20.2/dist/maplibre-gl.css' />
     <script src='https://unpkg.com/maplibre-gl@5.20.2/dist/maplibre-gl.js'></script>
-    <link rel='stylesheet' href='./css/style.css?v=14' />
+    <link rel='stylesheet' href='./css/style.css?v=13' />
     <style>
 
     </style>
@@ -15,15 +15,11 @@
 
 <body>
     <div id="map"></div>
-    <div class="zoo-logo-wrap">
-        <a href="https://www.henryvilaszoo.gov/" target="_blank" rel="noopener noreferrer" class="zoo-logo-link">
-            <img src="./img/henry-vilas-zoo-logo.png" class="zoo-logo">
-        </a>
-    </div>
+
     <div id="zoo-panel-wrap" class="zoo-panel-wrap collapsed">
         <div class="zoo-panel">
             <button id="zoo-panel-tab" class="zoo-panel-tab" type="button" aria-expanded="false">
-                Map Info
+                Welcome To the Henry Vilas Zoo
             </button>
 
             <div class="zoo-panel-content">
@@ -592,17 +588,16 @@
 
                         }
                     },
-
                     {
-                        id: 'zoo_boundary_outline',
+                        id: 'zoo_boundary_outer',
                         type: 'line',
                         source: 'zoo',
                         'source-layer': 'zoo_boundary',
                         minzoom: 14,
                         paint: {
-                            'line-color': '#2f4f2f',
-                            'line-width': 5,
-                            'line-dasharray': [2, 2],
+                            'line-color': '#153b7a',
+                            'line-width': 7,
+                            //'line-dasharray': [6, 2],
                             'line-opacity': 0.85
                         },
                         layout: {
@@ -610,6 +605,24 @@
                             'line-cap': 'round'
                         }
                     },
+                    {
+                        id: 'zoo_boundary_outline',
+                        type: 'line',
+                        source: 'zoo',
+                        'source-layer': 'zoo_boundary',
+                        minzoom: 14,
+                        paint: {
+                            'line-color': '#f4e27a',
+                            'line-width': 3,
+                            'line-dasharray': [6, 2],
+                            'line-opacity': 0.85
+                        },
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        }
+                    },
+
                     {
                         id: 'buildings-shadow',
                         type: 'fill',
@@ -648,7 +661,6 @@
                             'fill-extrusion-vertical-gradient': true
                         }
                     }
-                    /* labels intentionally omitted for now */
                 ]
             },
             center: [-89.41296024079732, 43.059350084177574],
@@ -658,7 +670,7 @@
         window.zooMap = map;
         map.on('style.load', () => {
             map.setProjection({
-                type: 'globe', // Set projection to globe
+                type: 'globe',
             });
 
         });
@@ -685,6 +697,53 @@
             };
             img.onerror = (e) => console.error('failed', e);
             img.src = './img/greenspace.png';
+
+            const zooLogoMarkerEl = document.createElement('button');
+            zooLogoMarkerEl.className = 'zoo-map-logo-marker';
+            zooLogoMarkerEl.type = 'button';
+            zooLogoMarkerEl.setAttribute('aria-label', 'Return to zoo home view');
+            zooLogoMarkerEl.title = 'Return to home view';
+
+            const zooLogoImg = document.createElement('img');
+            zooLogoImg.src = './img/henry-vilas-zoo-logo.png';
+            zooLogoImg.alt = 'Henry Vilas Zoo';
+            zooLogoImg.className = 'zoo-map-logo-marker-img';
+
+            zooLogoMarkerEl.appendChild(zooLogoImg);
+
+            const zooLogoMarker = new maplibregl.Marker({
+                element: zooLogoMarkerEl,
+                anchor: 'center'
+            })
+                .setLngLat([-89.41296024079732, 43.059350084177574])
+                .addTo(map);
+
+            function resetToHomeView() {
+                if (typeof window.zooCloseActivePopup === 'function') {
+                    window.zooCloseActivePopup();
+                }
+
+                map.easeTo({
+                    center: [-89.41296024079732, 43.059350084177574],
+                    zoom: 16,
+                    pitch: 35,
+                    bearing: 0,
+                    duration: 900
+                });
+            }
+
+            zooLogoMarkerEl.addEventListener('click', (event) => {
+                event.stopPropagation();
+                resetToHomeView();
+            });
+
+            function updateZooLogoMarkerVisibility() {
+                const z = map.getZoom();
+                zooLogoMarkerEl.style.display = z < 14 ? 'flex' : 'none';
+            }
+
+            updateZooLogoMarkerVisibility();
+            map.on('zoom', updateZooLogoMarkerVisibility);
         });
     </script>
     <script src="https://unpkg.com/exifr/dist/lite.umd.js"></script>
