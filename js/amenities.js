@@ -155,6 +155,16 @@
         await window.zooBuildRouteTo(nearest.lngLat, userLoc);
     }
 
+    function collapseZooPanel() {
+        const panelWrap = document.getElementById('zoo-panel-wrap');
+        const panelTab = document.getElementById('zoo-panel-tab');
+
+        if (!panelWrap || !panelTab) return;
+
+        panelWrap.classList.add('collapsed');
+        panelTab.setAttribute('aria-expanded', 'false');
+    }
+
     function initAmenitiesSelect() {
         const select = document.getElementById('amenitySelect');
         if (!select) return;
@@ -165,6 +175,7 @@
 
             try {
                 await routeToNearestAmenity(amenity);
+                collapseZooPanel();
             } catch (err) {
                 console.error(err);
                 alert(err.message || 'Routing failed.');
