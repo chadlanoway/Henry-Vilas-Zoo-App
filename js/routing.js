@@ -575,6 +575,10 @@ async function buildRouteTo(endLngLat, startLngLatOverride = null) {
         routeActive = true;
         fitRoute(routeGeojson);
 
+        window.setTimeout(() => {
+            orientMapToRouteDestination(routeGeojson, startLngLat);
+        }, 950);
+
         const distanceMeters = summary?.distance_meters;
         const durationSeconds = summary?.duration_seconds;
 
