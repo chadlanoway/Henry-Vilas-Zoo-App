@@ -148,6 +148,11 @@ function clearRoute() {
     routingArmed = false;
     routeRequestInFlight = false;
     setRoutingButtonState();
+    map.easeTo({
+        bearing: 0,
+        pitch: map.getPitch(),
+        duration: 500
+    });
 }
 
 function createUserLocationMarker() {
@@ -266,6 +271,47 @@ function fitRoute(geojson) {
     });
 }
 
+function getBearing(fromCoord, toCoord) {
+    const [lng1, lat1] = fromCoord;
+    const [lng2, lat2] = toCoord;
+
+    const phi1 = lat1 * Math.PI / 180;
+    const phi2 = lat2 * Math.PI / 180;
+    const lambda1 = lng1 * Math.PI / 180;
+    const lambda2 = lng2 * Math.PI / 180;
+
+    const y = Math.sin(lambda2 - lambda1) * Math.cos(phi2);
+    const x =
+        Math.cos(phi1) * Math.sin(phi2) -
+        Math.sin(phi1) * Math.cos(phi2) * Math.cos(lambda2 - lambda1);
+
+    return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+}
+
+function orientMapToRouteDestination(routeGeojson, startLngLat = null) {
+    const lineFeature = routeGeojson?.features?.find(
+        (feature) => feature.geometry?.type === 'LineString'
+    );
+
+    const coords = lineFeature?.geometry?.coordinates;
+    if (!coords || !coords.length) return;
+
+    const destinationCoord = coords[coords.length - 1];
+
+    const fromCoord = startLngLat
+        ? [startLngLat.lng, startLngLat.lat]
+        : [map.getCenter().lng, map.getCenter().lat];
+
+    const bearing = getBearing(fromCoord, destinationCoord);
+
+    map.easeTo({
+        center: destinationCoord,
+        bearing,
+        pitch: map.getPitch(),
+        duration: 900
+    });
+}
+
 async function buildRouteTo(endLngLat, startLngLatOverride = null) {
     if (routeRequestInFlight) return;
 
@@ -297,7 +343,12 @@ async function buildRouteTo(endLngLat, startLngLatOverride = null) {
         ensureRouteLayers();
         map.getSource(ROUTE_SOURCE_ID).setData(payload.route);
         routeActive = true;
+
         fitRoute(payload.route);
+
+        window.setTimeout(() => {
+            orientMapToRouteDestination(payload.route, startLngLat);
+        }, 950);
 
         const distanceMeters = payload.summary?.distance_meters;
         const durationSeconds = payload.summary?.duration_seconds;
