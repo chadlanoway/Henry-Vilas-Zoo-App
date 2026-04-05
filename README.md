@@ -16,17 +16,24 @@ This project is split into a lightweight frontend and a few hosted services:
 * **Photo upload + metadata API:** AWS API Gateway + Lambda + S3 + DynamoDB
 * **Routing API:** AWS API Gateway + Lambda
 
+
 ## Features
 
 * Custom zoo basemap using hosted **vector tiles**
 * Multiple background basemap options
 * 3D buildings and styled zoo layers
-* Amenity icons and labels
+* Amenity labels and icons derived from GeoJSON
+* **Amenity finder dropdown** (restrooms, food, gifts, etc.) that routes to the nearest matching location
 * Animal finder dropdown that zooms to a selected exhibit
 * Photo uploads using EXIF GPS when available, with device location fallback
-* Visitor photo points and popups
-* Route generation from the user’s current location to a clicked destination
-* Mobile-friendly sliding info panel
+* Visitor photo points with styled popups
+* **Dynamic routing system:**
+
+  * Walking routes within the zoo
+  * Automatic **drive + walk routing** when outside the zoo boundary
+  * Route styling that differentiates walking vs driving segments
+  * Map orientation aligned to destination
+* Mobile-friendly sliding info panel with tabbed controls
 
 ## Tech Stack
 
@@ -51,6 +58,7 @@ This project is split into a lightweight frontend and a few hosted services:
 │   ├── labels.js
 │   ├── animals.js
 │   ├── photos.js
+│   ├── amenities.js
 │   └── routing.js
 └── img/
     ├── henry-vilas-zoo-logo.png
@@ -85,7 +93,34 @@ Users can upload a photo from the app. The upload flow requests a presigned S3 U
 
 ### Routing
 
-The routing widget lets the user choose a destination on the map and requests a route from the routing API using the device’s current location. The route is drawn as a styled GeoJSON line on top of the map.
+The routing system supports both simple and multi-stage navigation depending on the user’s location.
+
+If the user is inside the zoo boundary, a walking route is generated directly to the destination.
+If the user is outside the zoo boundary, the app:
+Finds the nearest parking location relative to the destination
+Generates a driving route from the user to that parking point
+Generates a walking route from parking to the destination
+Combines both routes into a single visual path
+
+Routes are styled to visually distinguish segments:
+
+Driving: solid line
+Walking: dashed line with shared color styling
+
+The map also automatically orients toward the destination after routing for a more intuitive navigation experience.
+
+### Amenities
+
+Amenity data is loaded from a GeoJSON dataset and includes locations such as restrooms, food, gifts, and recreational areas.
+
+The amenity dropdown allows users to:
+
+* Select a category (e.g., Restrooms)
+* Automatically find the **nearest matching amenity**
+* Generate a route to that location using the routing system
+
+Amenity types support multiple values per feature (e.g., "restroom, water"), allowing flexible matching and categorization.
+
 
 ## Deployment
 
